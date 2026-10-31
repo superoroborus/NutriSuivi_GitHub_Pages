@@ -1,25 +1,35 @@
-# NutriSuivi — version GitHub Pages
+# NutriSuivi v4 — GitHub Pages
 
-Application statique mobile, sans serveur ni Python. Journal alimentaire, poids, graphiques, dîners, saisie texte, dictée si navigateur compatible, photo avec aperçu sans analyse automatique, export/import JSON.
+Cette version est issue de NutriSuivi v3 et conserve les clefs `localStorage` (`nutrisuivi-v1`, `nutrisuivi-extras-v2`), les favoris, les repas et les pesées. Exporter une sauvegarde JSON avant la mise à jour. **Ne pas vider les données du site.**
 
-## Installer sur GitHub Pages
+## Déployer
 
-1. Créer un dépôt **public** `nutrisuivi` sur GitHub.
-2. Déposer à la **racine** `index.html`, `manifest.webmanifest`, `sw.js`, `icon.svg` (ne pas télécharger uniquement le ZIP dans le dépôt).
-3. **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: main / (root) → Save**.
-4. Ouvrir `https://superoroborus.github.io/nutrisuivi/` lorsque la publication est active.
-5. Sur Android Chrome : menu → **Installer l'application** ou **Ajouter à l'écran d'accueil**.
+Remplacer à la racine du dépôt `index.html`, `sw.js`, `README.md` et **ajouter** `food-sources.js`. Conserver `manifest.webmanifest`, `icon.svg`. L'ancien `ai.js` peut être conservé mais n'est plus chargé ; aucune clé API n'est nécessaire. GitHub Pages : Settings > Pages > Deploy from branch > main > / (root). Le cache change de version automatiquement.
 
-## Confidentialité et limites
+## Fonctions
 
-- Les pesées, objectifs, menus et aliments restent uniquement dans le stockage du navigateur (`localStorage`) de l'appareil. **Ils ne sont pas synchronisés entre appareils**.
-- **Exporter régulièrement la sauvegarde JSON** ; vider les données du navigateur ou changer de téléphone peut effacer l'historique. L'import écrase les données existantes.
-- La photo s'affiche en aperçu mais **l'IA photo est désactivée** : GitHub Pages ne peut pas garder secrète une clé API. Nécessite plus tard un backend séparé et sécurisé. Ne pas placer de clé dans le dépôt.
-- Saisie texte : petite base illustrative de valeurs approximatives par 100 g, non exhaustive, non validée pour usage clinique. La recherche ne traite qu'un aliment à la fois ; modifier manuellement les apports.
-- Dictée vocale : API SpeechRecognition selon navigateur, éventuellement traitement par le fournisseur du navigateur ; rien n'est téléversé par le code de l'application.
-- Le service worker permet d'utiliser les fichiers en cache hors ligne après une première visite, sous réserve du comportement du navigateur.
-- L'application ne remplace pas un professionnel de santé.
+- Recherche de noms de produits et de codes-barres via Open Food Facts. Code-barres manuel compatible partout. Détection caméra avec `BarcodeDetector` seulement dans les navigateurs compatibles ; sinon saisie manuelle.
+- Contrôle des valeurs par 100 g, refus des fiches incomplètes et ajout à la vérification existante avant enregistrement.
+- Import **facultatif** de données Ciqual normalisées dans un CSV UTF-8 local, colonnes `name;kcal;protein;carbs;fat`, chiffres par 100 g. Il n'y a **pas** de table Ciqual embarquée dans cette archive car l'export officiel n'a pas pu être récupéré ni validé. Les XML Ciqual officiels ne sont **pas** pris en charge directement. Ne pas désigner un CSV quelconque comme Ciqual sans provenance vérifiée.
+- L'analyse automatique des photographies n'est pas disponible sans IA ; le bouton/photo existant reste dans l'interface mais signale son indisponibilité.
 
-## Test local
+## Provenance, droits et limites
 
-Ouvrir `index.html` pour les fonctions principales, ou lancer un serveur statique `python -m http.server 8000` pour tester dans des conditions proches de l'hébergement.
+Open Food Facts : https://openfoodfacts.github.io/documentation/docs/Product-Opener/api/ — données collaboratives sous ODbL, attribution et conditions de partage à l'identique lorsque applicables. Limites : 15 lectures produit et 10 recherches/minute/IP. Les appels sont déclenchés par l'utilisateur, jamais lors de la saisie au fil des caractères.
+
+Anses, **Ciqual 2025**, Du Chaffaut et al., DOI https://doi.org/10.57745/RDMHWY, Licence Ouverte Etalab 2.0. Les valeurs importées proviennent de fichiers fournis par l'utilisateur et doivent être contrôlées. Il ne faut pas prétendre que les vingt valeurs de base de l'application viennent de Ciqual.
+
+## Confidentialité
+
+Seule la requête de recherche ou le code-barres sont transmis à Open Food Facts ; aucune pesée ni journal n'est transmis. Les données de journal et les aliments importés restent en `localStorage` sur le navigateur courant ; exporter des sauvegardes JSON régulièrement. Pas de synchronisation multi-appareils.
+
+## Essais à effectuer sur Android
+
+1. Effectuer un export JSON, ajouter un aliment, actualiser et vérifier qu'il reste présent.
+2. Rechercher un code-barres connu, choisir le produit, modifier la quantité et enregistrer.
+3. Rechercher un produit absent ou non renseigné : pas de valeurs inventées.
+4. Importer un petit CSV de test avec des valeurs vérifiées, utiliser un aliment et rafraîchir.
+5. Vérifier les favoris, la copie de repas/journée, les pesées, le planning et le mode hors ligne.
+6. Vérifier le bouton scanner sur le modèle de téléphone utilisé : la compatibilité varie selon le navigateur.
+
+Les tests de l'API Open Food Facts depuis le navigateur publié et les essais réels Android restent à effectuer. 
