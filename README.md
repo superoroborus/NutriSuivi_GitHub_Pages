@@ -15,3 +15,11 @@ Une ligne par date ayant au moins une pesée ou un aliment enregistré. Si aucun
 ## Contrôle rapide
 
 Après publication : enregistrer une pesée et un repas, exporter 30 jours, ouvrir le fichier dans Excel et vérifier les totaux. Contrôler aussi que les favoris, les recherches Open Food Facts et l’export/import JSON fonctionnent toujours.
+
+## V6 — Calculatrice facultative
+
+Nouvel onglet « Calculatrice » : âge adulte, poids, taille, choix de l'équation femme/homme, activité, objectif et répartition protéine/glucides/lipides. Résultats indicatifs selon Mifflin–St Jeor (1990) et coefficients d'activité usuels. Aucun questionnaire obligatoire au démarrage. Le bouton « Appliquer » est le seul mécanisme modifiant `settings.target_kcal`, via l'API locale déjà existante. Les entrées de la calculatrice restent dans `localStorage` (`nutrisuivi-calculator-v1`) sur le même navigateur ; la sauvegarde JSON historique peut ne pas inclure ces préférences facultatives. Les journaux/poids/export JSON/CSV et Open Food Facts ne sont pas modifiés.
+
+Sources : Mifflin MD et al., *Am J Clin Nutr* 1990;51:241–247, https://pubmed.ncbi.nlm.nih.gov/2305711/ ; Texas HHS, *Common Comparative Standards* (rév. 2022), facteurs d'activité https://www.hhs.texas.gov/sites/default/files/documents/common-comparative-standards-for-rds-ltc-settings.pdf .
+
+Installation : remplacer les fichiers du dépôt GitHub Pages par ceux de cette archive et ajouter `macro-calculator.js`. Sauvegarder vos données au préalable. Vérifier sur smartphone après publication.
