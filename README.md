@@ -23,3 +23,8 @@ Nouvel onglet « Calculatrice » : âge adulte, poids, taille, choix de l'équat
 Sources : Mifflin MD et al., *Am J Clin Nutr* 1990;51:241–247, https://pubmed.ncbi.nlm.nih.gov/2305711/ ; Texas HHS, *Common Comparative Standards* (rév. 2022), facteurs d'activité https://www.hhs.texas.gov/sites/default/files/documents/common-comparative-standards-for-rds-ltc-settings.pdf .
 
 Installation : remplacer les fichiers du dépôt GitHub Pages par ceux de cette archive et ajouter `macro-calculator.js`. Sauvegarder vos données au préalable. Vérifier sur smartphone après publication.
+
+
+## v6.1 — Exports simplifiés
+
+Sur l'**Accueil**, au-dessous des indicateurs et du journal du jour, le bilan CSV est visible une seule fois. La sauvegarde/restauration JSON est conservée sous une section repliée « Sauvegarde complète et restauration (JSON) ». Les identifiants des boutons et les clés de stockage existants sont conservés. Aucune migration nécessaire.
