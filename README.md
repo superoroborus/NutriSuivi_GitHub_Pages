@@ -1,4 +1,4 @@
-# NutriSuivi V8 — archive complète GitHub Pages
+# NutriSuivi V8.1 — archive complète GitHub Pages
 
 ## Installation sans édition de code
 
@@ -13,12 +13,12 @@
 
 - Onglet Calculatrice : bloc **Protéines en g/kg** indépendant, coefficient et poids de référence choisis, possibilité de reprendre la dernière pesée, mise à jour automatique **sur action explicite** selon la dernière pesée, bouton pour appliquer l'objectif au tableau de bord.
 - Accueil : **Export Excel XLSX** local avec cinq feuilles : Suivi journalier, Détail aliments, Repas et plats, Suivi poids, Paramètres. Filtre 30/90 jours, période personnalisée, historique complet. Dates ISO, numériques en cellules numériques, aucun recalcul fictif des journées absentes. Les objectifs actuels ne sont pas présentés comme des objectifs historiques.
-- Onglet d'ajout : **Partager la photo et la consigne vers Gemini** via la feuille de partage Android si prise en charge ; repli vers copie de la consigne et partage image uniquement. Aucun appel d'API Gemini.
+- Onglet d'ajout : **Partager le prompt vers une IA** à partir du nom ou de la description du plat. La feuille de partage permet d'envoyer le texte vers ChatGPT, Gemini ou une autre IA ; repli vers copie dans le presse-papiers. Aucun appel d'API ni partage de photo.
 - La sauvegarde JSON inclut désormais les réglages complémentaires V7/V8 et l'import est rétrocompatible avec les anciens JSON. Les journaux existants ne sont jamais réécrits lors de la mise à jour.
 
 ## Limites et précautions
 
-- Une photo ne fournit qu'une **estimation** : les ingrédients invisibles, sauces et portions sont incertains. Gemini peut ne pas recevoir simultanément l'image et le texte malgré une Web Share API compatible. Vérifier dans Gemini avant de valider. L'analyse externe transmet la photographie à Google uniquement par action volontaire.
+- L'estimation par IA repose uniquement sur la **description textuelle** fournie par l'utilisateur. Elle reste approximative et dépend de la qualité de la description. Vérifier les résultats avant de les enregistrer.
 - L'équivalence entre une portion/pièce et des grammes, ou entre ml et g, doit être **documentée pour l'aliment**. La V8 ne prétend pas convertir une densité inconnue. Les limites du moteur de saisie historique persistent.
 - Le JSON des versions anciennes ne contenait pas les objectifs V7 et réglages de la calculatrice. Une restauration depuis un ancien fichier ne peut pas restituer des réglages qui n'y figuraient pas.
 - Le fichier XLSX est généré directement en JavaScript sans bibliothèque ni réseau. Le format est XLSX/OpenXML minimal sans style ni formule.
