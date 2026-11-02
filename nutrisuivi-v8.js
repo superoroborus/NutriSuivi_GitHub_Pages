@@ -34,16 +34,56 @@ const home=$('dashboard');if(home){let part=document.createElement('section');pa
 let exp=$('exportBtn'),imp=$('importFile');if(exp){exp.onclick=()=>{let all={version:8,exported:new Date().toISOString(),meals:state.meals,weights:state.weights,plan:state.plan,settings:state.settings,extra:typeof nsExtra!=='undefined'?nsExtra:{},extension:{calculator:get('nutrisuivi-calculator-v1'),goals:get('nutrisuivi-v7-goals'),protein:get(pk)}};let a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(all,null,2)],{type:'application/json'}));a.href=url;a.download='nutrisuivi-sauvegarde-'+dateLocal(new Date())+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}}
 // Backup restore is deliberately left as original unless extension metadata is present; add a separate import control to avoid intercepting legacy safety checks.
 if(home){let restore=document.createElement('section');restore.className='card';restore.innerHTML=`<details><summary>Restaurer les paramètres facultatifs V8 depuis une sauvegarde complète</summary><p class="muted">Restaurer d'abord la sauvegarde JSON du journal avec le bouton habituel. Ensuite, pour une sauvegarde V8, importer ici les objectifs et préférences supplémentaires (sans modifier les repas).</p><input type="file" id="v8RestoreExtras" accept=".json,application/json"><p class="status" id="v8RestoreStatus"></p></details>`;home.append(restore);$('v8RestoreExtras').onchange=async e=>{try{let file=e.target.files?.[0];if(!file)return;if(file.size>5e6)throw Error('Fichier trop volumineux');let v=JSON.parse(await file.text());if(!v.extension||typeof v.extension!=='object')throw Error('Cette sauvegarde ne contient pas de paramètres V8.');if(!confirm('Restaurer les préférences calculatrice, objectifs et protéines de ce JSON ?'))return;for(let [key,name] of [['calculator','nutrisuivi-calculator-v1'],['goals','nutrisuivi-v7-goals'],['protein',pk]])if(v.extension[key]&&typeof v.extension[key]==='object')set(name,v.extension[key]);$('v8RestoreStatus').textContent='Préférences restaurées. Actualisez la page.'}catch(error){$('v8RestoreStatus').textContent=error.message}}}
-// IA prompt sharing from text description only: no photo, no API, Android/desktop share when available.
+// V8.2: text-only AI prompt. Share in the direct user-click stack, otherwise show a copyable prompt.
 const promptField=$('aiDishDescription'), shareBtn=$('shareAIPromptBtn'), copyBtn=$('copyAIPromptBtn'), preview=$('aiPromptPreview'), promptStatus=$('aiPromptStatus');
 function buildAIPrompt(){
-  let desc=(promptField?.value||$('mealText')?.value||$('mealName')?.value||'').trim();
-  if(!desc) throw Error('Renseignez le nom du plat ou une description avant de partager le prompt.');
-  return `Analyse ce plat à partir de sa description textuelle, sans photographie.\n\nPlat ou description fournie : ${desc}\n\nIdentifie le nom le plus probable du plat ou les plats plausibles. Estime les quantités correspondant à une portion individuelle, en tenant compte du type de préparation, des matières grasses, sauces et accompagnements éventuels. Je suis à l'extérieur et ne peux pas peser les aliments ni connaître précisément leur préparation. Je souhaite donc une estimation nutritionnelle réaliste, pas une précision artificielle.\n\nPrésente les résultats sous cette forme :\n- Nom du plat :\n- Composition estimée :\n- Quantités :\n- Calories :\n- Protéines :\n- Glucides :\n- Lipides :\n- Hypothèses et incertitudes :\n\nSi plusieurs plats sont possibles, indique les alternatives plutôt que de choisir arbitrairement.`;
+  const description=String(promptField?.value||'').trim();
+  if(!description)throw Error('Saisissez d’abord le nom ou la description de votre plat.');
+  return `Analyse ce nom de plat ou cette description de plat :
+
+${description}
+
+Identifie le plat probable et les aliments qui le composent. Estime les quantités pour une portion individuelle en tenant compte des sauces, huiles et accompagnements possibles. Je ne connais pas exactement la préparation : précise les incertitudes et évite les fausses précisions.
+
+Réponds sous les rubriques :
+- Nom du plat :
+- Composition estimée :
+- Quantités :
+- Calories :
+- Protéines :
+- Glucides :
+- Lipides :
+- Hypothèses et incertitudes :
+
+Propose plusieurs hypothèses si nécessaire.`;
 }
-function refreshPromptPreview(){ if(preview){ try{ preview.textContent = buildAIPrompt(); } catch { preview.textContent = 'Le prompt apparaîtra ici dès que vous aurez saisi le nom ou la description du plat.'; } } }
-if(promptField){ promptField.addEventListener('input', refreshPromptPreview); refreshPromptPreview(); }
-if(shareBtn){ shareBtn.onclick=async()=>{ try{ let text=buildAIPrompt(); if(!navigator.share) throw Error('Partage natif non disponible'); await navigator.share({title:'Prompt nutritionnel pour IA', text}); promptStatus.textContent='Prompt partagé. Choisissez l’IA de votre choix pour l’envoyer.'; } catch(e){ if(e.name==='AbortError'){ promptStatus.textContent='Partage annulé.'; return; } try{ let text=buildAIPrompt(); if(navigator.clipboard?.writeText){ await navigator.clipboard.writeText(text); promptStatus.textContent='Partage impossible ou non disponible ici. Le prompt a été copié : vous pouvez le coller dans ChatGPT, Gemini ou une autre IA.'; } else throw Error('Presse-papiers non disponible'); } catch(err){ promptStatus.textContent=err.message||e.message; } } }; }
-if(copyBtn){ copyBtn.onclick=async()=>{ try{ let text=buildAIPrompt(); if(!navigator.clipboard?.writeText) throw Error('Copie non disponible dans ce navigateur'); await navigator.clipboard.writeText(text); promptStatus.textContent='Prompt copié dans le presse-papiers.'; } catch(e){ promptStatus.textContent=e.message; } }; }
+function updatePrompt(){if(!preview)return;try{preview.value=buildAIPrompt()}catch{preview.value='Saisissez un nom ou une description de plat pour générer le prompt.'}}
+function message(text){if(promptStatus)promptStatus.textContent=text}
+async function fallbackCopy(text){
+  if(navigator.clipboard?.writeText){try{await navigator.clipboard.writeText(text);return true}catch{}}
+  if(!document.execCommand)return false;
+  const t=document.createElement('textarea');t.value=text;t.setAttribute('readonly','');t.style.position='fixed';t.style.left='-9999px';document.body.appendChild(t);t.select();let ok=false;try{ok=document.execCommand('copy')}catch{}t.remove();return ok;
+}
+if(promptField)promptField.addEventListener('input',()=>{updatePrompt();message('')});
+updatePrompt();
+if(shareBtn)shareBtn.addEventListener('click',()=>{
+  let text;try{text=buildAIPrompt()}catch(e){message(e.message);promptField?.focus();return}
+  // Calling share synchronously in a click handler keeps Android's transient user activation.
+  if(typeof navigator.share==='function'){
+    let result;
+    try{result=navigator.share({title:'Analyse nutritionnelle du plat',text})}catch(e){result=Promise.reject(e)}
+    Promise.resolve(result).then(()=>message('Menu de partage utilisé. Vérifiez que l’IA choisie a reçu le texte.')).catch(async e=>{
+      if(e?.name==='AbortError'){message('Partage annulé. Le prompt reste affiché ci-dessous.');return}
+      const copied=await fallbackCopy(text);
+      message(copied?'Le partage natif n’a pas abouti : prompt copié. Collez-le dans votre IA.':'Le partage natif n’a pas abouti : sélectionnez et copiez le prompt affiché ci-dessous.');
+    });
+  }else{
+    fallbackCopy(text).then(ok=>message(ok?'Partage natif indisponible : prompt copié, collez-le dans votre IA.':'Partage natif indisponible : sélectionnez et copiez le prompt affiché ci-dessous.'));
+  }
+});
+if(copyBtn)copyBtn.addEventListener('click',()=>{
+  let text;try{text=buildAIPrompt()}catch(e){message(e.message);promptField?.focus();return}
+  fallbackCopy(text).then(ok=>message(ok?'Prompt copié dans le presse-papiers.':'Copie automatique indisponible : sélectionnez le prompt affiché ci-dessous pour le copier.'));
+});
 if(typeof module!=='undefined'&&module.exports)module.exports={xlsx,exportData,worksheet,crc32,zip};
 })();

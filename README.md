@@ -1,4 +1,4 @@
-# NutriSuivi V8.1 — archive complète GitHub Pages
+# NutriSuivi V8.2 — archive complète GitHub Pages
 
 ## Installation sans édition de code
 
@@ -23,3 +23,7 @@
 - Le JSON des versions anciennes ne contenait pas les objectifs V7 et réglages de la calculatrice. Une restauration depuis un ancien fichier ne peut pas restituer des réglages qui n'y figuraient pas.
 - Le fichier XLSX est généré directement en JavaScript sans bibliothèque ni réseau. Le format est XLSX/OpenXML minimal sans style ni formule.
 - Tests automatisés présents dans `tests-v8.js`, exécutables par `node tests-v8.js` (non nécessaire à l'installation). Test Android/Gemini réel et restauration complète navigateur **non réalisés** ici.
+
+## Correctif V8.2 — Partage texte seul
+
+La section IA est dans l’onglet « Ajouter ». Saisir le nom ou la description du plat ; le prompt complet est visible et actualisé automatiquement. Le bouton « Partager le prompt vers une IA » utilise le menu de partage natif lorsqu’il est disponible, sinon tente une copie dans le presse-papiers. Le bouton « Copier le prompt » reste disponible. Aucun fichier photo n’est utilisé, aucune API externe appelée par NutriSuivi. La prise en charge par chaque application cible dépend du navigateur et du système.
