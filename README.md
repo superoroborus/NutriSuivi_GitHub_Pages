@@ -1,30 +1,25 @@
-# NutriSuivi v5 — export CSV Excel
+# NutriSuivi V8 — archive complète GitHub Pages
 
-Version construite sur la v4. Les fichiers de stockage (`nutrisuivi-v1`, `nutrisuivi-extras-v2`) et le bouton de sauvegarde JSON restent inchangés.
+## Installation sans édition de code
 
-## Publication GitHub Pages
+1. Dans la version actuellement utilisée, ouvrir Accueil → sauvegarde complète → **Exporter JSON**. Conserver ce fichier hors de GitHub (ne jamais publier les données personnelles dans le dépôt public).
+2. Sur GitHub, ouvrir le dépôt `superoroborus/NutriSuivi_GitHub_Pages` → **Code** → **Add file** → **Upload files**.
+3. Décompresser ce ZIP et glisser **tous les fichiers qu’il contient** à la racine du dépôt (pas le dossier lui-même). GitHub indiquera les fichiers remplacés et ajoutés.
+4. Vérifier les noms, puis **Commit changes**. Aucune édition manuelle des balises `<script>` nécessaire.
+5. Attendre la publication GitHub Pages puis actualiser la page sur le téléphone. Si la version reste ancienne, fermer/réouvrir le navigateur et recharger.
+6. Vérifier le journal, les objectifs, le CSV et XLSX avec des données fictives avant de compter sur le nouveau dispositif.
 
-Exporter une sauvegarde JSON **avant** la mise à jour. Remplacer `index.html`, `sw.js`, `README.md` et ajouter `csv-export.js` à la racine du dépôt. Conserver `food-sources.js`, `manifest.webmanifest`, `icon.svg`. Ne pas supprimer les données du navigateur. Le nouveau service worker utilise un cache v5.
+## Nouvelles fonctions
 
-## Export CSV
+- Onglet Calculatrice : bloc **Protéines en g/kg** indépendant, coefficient et poids de référence choisis, possibilité de reprendre la dernière pesée, mise à jour automatique **sur action explicite** selon la dernière pesée, bouton pour appliquer l'objectif au tableau de bord.
+- Accueil : **Export Excel XLSX** local avec cinq feuilles : Suivi journalier, Détail aliments, Repas et plats, Suivi poids, Paramètres. Filtre 30/90 jours, période personnalisée, historique complet. Dates ISO, numériques en cellules numériques, aucun recalcul fictif des journées absentes. Les objectifs actuels ne sont pas présentés comme des objectifs historiques.
+- Onglet d'ajout : **Partager la photo et la consigne vers Gemini** via la feuille de partage Android si prise en charge ; repli vers copie de la consigne et partage image uniquement. Aucun appel d'API Gemini.
+- La sauvegarde JSON inclut désormais les réglages complémentaires V7/V8 et l'import est rétrocompatible avec les anciens JSON. Les journaux existants ne sont jamais réécrits lors de la mise à jour.
 
-Dans la section **Sauvegardes** en bas de l’application, choisir 30 jours, 90 jours ou tout l’historique, puis **Exporter mon suivi CSV**. Le fichier est généré localement sans réseau. Encodage UTF-8 BOM ; séparateur point-virgule ; décimales avec virgule ; dates ISO AAAA-MM-JJ. Colonnes : date, poids en kg, énergie en kcal, protéines, glucides, lipides en g, nombre de catégories de repas renseignées.
+## Limites et précautions
 
-Une ligne par date ayant au moins une pesée ou un aliment enregistré. Si aucun aliment n’est déclaré pour une date, les apports sont laissés vides (pas à zéro). Les journées avec des repas renseignés peuvent être incomplètes : le nombre de catégories renseignées aide à le voir, mais ne garantit pas leur exhaustivité. Les pesées ne sont **pas** reportées sur les jours sans pesée. Le CSV est un tableau d’analyse, **pas une sauvegarde restaurable** : pour restaurer l’application, utiliser le JSON.
-
-## Contrôle rapide
-
-Après publication : enregistrer une pesée et un repas, exporter 30 jours, ouvrir le fichier dans Excel et vérifier les totaux. Contrôler aussi que les favoris, les recherches Open Food Facts et l’export/import JSON fonctionnent toujours.
-
-## V6 — Calculatrice facultative
-
-Nouvel onglet « Calculatrice » : âge adulte, poids, taille, choix de l'équation femme/homme, activité, objectif et répartition protéine/glucides/lipides. Résultats indicatifs selon Mifflin–St Jeor (1990) et coefficients d'activité usuels. Aucun questionnaire obligatoire au démarrage. Le bouton « Appliquer » est le seul mécanisme modifiant `settings.target_kcal`, via l'API locale déjà existante. Les entrées de la calculatrice restent dans `localStorage` (`nutrisuivi-calculator-v1`) sur le même navigateur ; la sauvegarde JSON historique peut ne pas inclure ces préférences facultatives. Les journaux/poids/export JSON/CSV et Open Food Facts ne sont pas modifiés.
-
-Sources : Mifflin MD et al., *Am J Clin Nutr* 1990;51:241–247, https://pubmed.ncbi.nlm.nih.gov/2305711/ ; Texas HHS, *Common Comparative Standards* (rév. 2022), facteurs d'activité https://www.hhs.texas.gov/sites/default/files/documents/common-comparative-standards-for-rds-ltc-settings.pdf .
-
-Installation : remplacer les fichiers du dépôt GitHub Pages par ceux de cette archive et ajouter `macro-calculator.js`. Sauvegarder vos données au préalable. Vérifier sur smartphone après publication.
-
-
-## v6.1 — Exports simplifiés
-
-Sur l'**Accueil**, au-dessous des indicateurs et du journal du jour, le bilan CSV est visible une seule fois. La sauvegarde/restauration JSON est conservée sous une section repliée « Sauvegarde complète et restauration (JSON) ». Les identifiants des boutons et les clés de stockage existants sont conservés. Aucune migration nécessaire.
+- Une photo ne fournit qu'une **estimation** : les ingrédients invisibles, sauces et portions sont incertains. Gemini peut ne pas recevoir simultanément l'image et le texte malgré une Web Share API compatible. Vérifier dans Gemini avant de valider. L'analyse externe transmet la photographie à Google uniquement par action volontaire.
+- L'équivalence entre une portion/pièce et des grammes, ou entre ml et g, doit être **documentée pour l'aliment**. La V8 ne prétend pas convertir une densité inconnue. Les limites du moteur de saisie historique persistent.
+- Le JSON des versions anciennes ne contenait pas les objectifs V7 et réglages de la calculatrice. Une restauration depuis un ancien fichier ne peut pas restituer des réglages qui n'y figuraient pas.
+- Le fichier XLSX est généré directement en JavaScript sans bibliothèque ni réseau. Le format est XLSX/OpenXML minimal sans style ni formule.
+- Tests automatisés présents dans `tests-v8.js`, exécutables par `node tests-v8.js` (non nécessaire à l'installation). Test Android/Gemini réel et restauration complète navigateur **non réalisés** ici.
